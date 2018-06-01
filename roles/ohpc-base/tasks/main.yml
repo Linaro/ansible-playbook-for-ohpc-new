@@ -33,15 +33,6 @@
     ( inventory_hostname in groups[nt_devnodes] ) or
     ( ( inventory_hostname in groups[nt_cnodes] ) and ( enable_warewulf == false ) ) 
 
-#yum -y --installroot=$CHROOT groupinstall ohpc-base-compute
-- name: Install ohpc-base-compute for computing node images on master
-  yum: name={{ item }} installroot="{{ compute_chroot_loc }}" state=latest
-  with_items:
-    - ohpc-base-compute
-  when:
-    - inventory_hostname in groups[nt_sms]
-    - enable_warewulf == true
-
 - name: Install ohpc-base-compute on computing nodes
   yum: name={{ item }} state=latest
   with_items:
@@ -49,15 +40,6 @@
   when:
     - inventory_hostname in groups[nt_cnodes]
     - enable_warewulf == false
-
-#cp -p /etc/resolv.conf $CHROOT/etc/resolv.conf
-- name: Copy /etc/resolv.conf to a computing node image on master
-  command: cp /etc/resolv.conf "{{ compute_chroot_loc }}/etc/resolv.conf"
-  register: result
-  failed_when: result.rc not in [0]
-  when:
-    - inventory_hostname in groups[nt_sms]
-    - enable_warewulf == true
 
 - name: Fetch /etc/resolv.conf in sms to a ansible local /tmp
   fetch:

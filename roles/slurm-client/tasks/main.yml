@@ -215,4 +215,4 @@
   service: name=slurmd state=started
   when:
     - inventory_hostname in groups[ nt_cnodes ]
-
+    - enable_warewulf == false

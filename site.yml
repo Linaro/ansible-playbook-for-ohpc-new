@@ -43,16 +43,19 @@
 
   roles:
     - common
+    - ohpc-base
+    - slurm-server
+    - warewulf-init
+    - ntp
+    - kernel
+    - lmod
+    - slurm-client
+    - nfs
+    - clustershell-mrsh-rsyslog
     - net-eth
     - net-ib
     - net-infinipath
-    - kernel
     - dhcpd
-    - ohpc-base
-    - lmod
-    - slurm-server
-    - nfs
-    - ntp
     - lustre-client
     - nagios
     - ganglia
@@ -79,7 +82,5 @@
     - third-party-libs-gnu7
     - third-party-libs-intel
     - imb
-    - warewulf
-    - slurm-client
-    # - booting-computing-nodes/
-
+    - warewulf-final
+    # - booting-computing-nodes
