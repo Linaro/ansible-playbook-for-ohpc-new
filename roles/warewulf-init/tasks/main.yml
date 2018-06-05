@@ -145,6 +145,17 @@
     - inventory_hostname in groups[nt_sms]
     - enable_warewulf == true
 
+- name: Generate cluster ssh keys on master
+  user:
+    name: root
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_type: rsa
+    ssh_key_file: .ssh/cluster
+  when:
+    - inventory_hostname in groups[nt_sms]
+    - enable_warewulf == false
+
 #cat ~/.ssh/cluster.pub >> $CHROOT/root/.ssh/authorized_keys
 - name: Create ~/.ssh in the computing node image
   file: path="{{ compute_chroot_loc }}/root/.ssh" state=directory mode=0700
@@ -170,7 +181,7 @@
 - name: Fetch /tmp/cluster.pub in sms to a ansible local /tmp
   fetch:
     src: /root/.ssh/cluster.pub
-    dest: /tmp/cluster.pub
+    dest: "{{ role_path }}/cluster.pub"
     flat: yes
   when:
     - inventory_hostname in groups[nt_sms]
@@ -178,7 +189,7 @@
 # stateful
 - name: Copy ~/.ssh/cluster.pub to /tmp to copy the key on master
   copy:
-    src: /tmp/cluster.pub
+    src: "{{ role_path }}/cluster.pub"
     dest: /root/.ssh/cluster.pub
   when:
     - inventory_hostname in groups[nt_cnodes]
@@ -190,7 +201,7 @@
     state: present
     backrefs: no
     create: yes
-    line: "{{ lookup('file', '/tmp/cluster.pub') }}"
+    line: "{{ lookup('file', '{{ role_path }}/cluster.pub') }}"
   when:
     - inventory_hostname in groups[nt_sms]
     - enable_warewulf == true
@@ -202,7 +213,7 @@
     state: present
     backrefs: no
     create: yes
-    line: "{{ lookup('file', '/tmp/cluster.pub') }}"
+    line: "{{ lookup('file', '{{ role_path }}/cluster.pub') }}"
   when:
     - inventory_hostname in groups[nt_cnodes]
     - enable_warewulf == false

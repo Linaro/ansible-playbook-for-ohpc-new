@@ -37,9 +37,12 @@
   when:
     - inventory_hostname in groups[nt_sms]
 
-- name: slum configuration on master
-  replace: dest=/etc/slurm/slurm.conf regexp='^NodeName=(\S+).+State=(\S+)' replace="NodeName={{ compute_prefix }}[1-{{ num_computes }}] State=\2" backup=yes
-- name: slum configuration on master
-  replace: dest=/etc/slurm/slurm.conf regexp='^PartitionName=normal Nodes=(\S+)' replace="PartitionName=normal Nodes={{ compute_prefix }}[1-{{ num_computes }}]" backup=yes
+- block:
+  - name: slum configuration on master
+    replace: dest=/etc/slurm/slurm.conf regexp='^NodeName=(\S+).+State=(\S+)' replace="NodeName={{ compute_prefix }}[1-{{ num_computes }}] State=\2" backup=yes
+  - name: slum configuration on master
+    replace: dest=/etc/slurm/slurm.conf regexp='^PartitionName=normal Nodes=(\S+)' replace="PartitionName=normal Nodes={{ compute_prefix }}[1-{{ num_computes }}]" backup=yes
+  when:
+    - inventory_hostname in groups[nt_sms]
 
 

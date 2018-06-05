@@ -157,7 +157,7 @@
   blockinfile:
     dest: "{{ ansible_env.HOME }}/.ssh/config"
     content:
-          "Host {{ compute_regex }}\n{{'\t'}}StrictHostKeyChecking no\nHost {{ sms_name }}\n{{'\t'}}StrictHostKeyChecking no\n"
+          "Host {{ compute_regex }}\n{{'\t'}}StrictHostKeyChecking no\n{{'\t'}}UserKnownHostsFile /dev/null\nHost {{ sms_name }}\n{{'\t'}}StrictHostKeyChecking no\n{{'\t'}}UserKnownHostsFile /dev/null\n"
   when:
     ( inventory_hostname in groups[nt_sms] ) or
     ( inventory_hostname in groups[nt_devnodes] ) or
@@ -167,12 +167,18 @@
   blockinfile:
     dest: "{{ ansible_home }}/.ssh/config"
     content:
-      "Host {{ compute_regex }}\n{{'\t'}}StrictHostKeyChecking no\nHost {{ sms_name }}\n{{'\t'}}StrictHostKeyChecking no\n"
+      "Host {{ compute_regex }}\n{{'\t'}}StrictHostKeyChecking no\n{{'\t'}}UserKnownHostsFile /dev/null\nHost {{ sms_name }}\n{{'\t'}}StrictHostKeyChecking no\n{{'\t'}}UserKnownHostsFile /dev/null\n"
   when:
-    ( inventory_hostname in groups[nt_sms] ) or
     ( inventory_hostname in groups[nt_devnodes] ) or
     ( ( inventory_hostname in groups[nt_cnodes] )  and ( enable_warewulf == false ) )
 
+- name: "Add the ssh configurations for ansible user login to cnodes and sms"
+  blockinfile:
+    dest: "{{ ansible_home }}/.ssh/config"
+    content:
+      "Host {{ compute_regex }}\n{{'\t'}}StrictHostKeyChecking no\n{{'\t'}}UserKnownHostsFile /dev/null\n{{'\t'}}IdentityFile /root/.ssh/cluster.pub\nHost {{ sms_name }}\n{{'\t'}}StrictHostKeyChecking no\n{{'\t'}}UserKnownHostsFile /dev/null\nIdentityFile /root/.ssh/cluster.pub"
+  when:
+    - inventory_hostname in groups[nt_sms]
 
 
 

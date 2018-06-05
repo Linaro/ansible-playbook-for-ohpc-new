@@ -173,6 +173,19 @@
     - inventory_hostname in groups[nt_sms]
     - enable_warewulf == true
 
+# Add additional modules that should be loaded by modprobe
+- name: Add modprobe += "{{ additional_modules }}" to WW_CONF
+  lineinfile:
+    path: /etc/warewulf/bootstrap.conf
+    state: present
+    backrefs: no
+    regexp: '^modprobe \+= "{{ additional_modules }}"$'
+    line: "modprobe += {{ additional_modules }}"
+  when:
+    - inventory_hostname in groups[nt_sms]
+    - enable_warewulf == true
+    - additional_modules != ''
+
 # wwbootstrap `uname -r`
 - name: Execute wwbootstrap `uname -r` on master
   shell: wwbootstrap `uname -r`
@@ -311,7 +324,13 @@
   when:
     - inventory_hostname in groups[nt_sms]
     - enable_ganglia == true
-# fi
+    # fi
+
+- name: Mount the nfs on the compute nodes
+  shell: mount -a
+  when:
+    - inventory_hostname in groups[nt_cnodes]
+    - enable_warewulf == false
 
 #systemctl restart dhcpd
 - name: Start dhcpd on master
