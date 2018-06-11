@@ -1,0 +1,36 @@
+- name: Create the ohpc-test user on cnodes
+  user:
+    name: ohpc-test
+  when:
+    - enable_warewulf == False
+    - inventory_hostname in groups[nt_cnodes]
+
+
+- block:
+    - name: Install test suite
+      yum:
+        name: test-suite-ohpc
+        state: latest
+
+    - name: Install TAU for openmpi3 (default is mpich)
+      yum:
+        name: tau-gnu7-openmpi3-ohpc
+        state: latest
+
+    - name: Create the ohpc-test user on cnodes
+      shell: "wwsh file resync passwd shadow group ; pdsh -w {{ compute_regex }} /warewulf/bin/wwgetfiles"
+      when:
+        - enable_warewulf == True
+
+    - name: Configure test suite
+      shell: cd /home/ohpc-test/tests &&  ./configure --disable-papi  --disable-likwid  --enable-fftw  --enable-scotch  --enable-boost  --enable-boost-mpi  --enable-ptscotch  --enable-openblas  --enable-plasma  --enable-packaging  --with-mpi-families=openmpi3  --with-compiler-families=gnu7  && make check
+      become: yes
+      become_user: ohpc-test
+      become_method: su
+      register: testsuite_output
+
+    - debug: msg="{{ testsuite_output.stdout_lines }} {{ testsuite_output.stderr_lines }}"
+
+  when:
+    - inventory_hostname in groups[nt_sms]
+    - enable_testsuiteohpc == True
