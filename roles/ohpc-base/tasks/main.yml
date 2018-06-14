@@ -59,8 +59,8 @@
 - name: Configure PDSH in bash.rc
   lineinfile:
     path: "{{ ansible_home }}/.bashrc"
-    regexp: '^PDSH_SSH_ARGS_APPEND='
-    line: 'PDSH_SSH_ARGS_APPEND="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/cluster.pub"'
+    regexp: '^export PDSH_SSH_ARGS_APPEND=.*$'
+    line: 'export PDSH_SSH_ARGS_APPEND="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/cluster.pub"'
     state: present
 
     #- name: Remove /tmp/resolv.conf on ansible local
