@@ -34,11 +34,27 @@
         name: tau-gnu7-openmpi3-ohpc
         state: latest
 
+    - name: Create the ohpc-test user on cnodes
+      shell: "wwsh file resync passwd shadow group ; pdsh -w {{ compute_regex }} /warewulf/bin/wwgetfiles"
+      when:
+        - enable_warewulf == True
+
+    - name: Render configure script template
+      template:
+        src: "{{ role_path }}/templates/configure.sh.j2"
+        dest: /home/ohpc-test/configure.sh
+        group: ohpc-test
+        owner: ohpc-test
+        mode: 0744 
+
     - name: Configure test suite
-      shell: cd /home/ohpc-test/tests &&  ./configure --disable-papi  --disable-likwid  --enable-fftw  --enable-scotch  --enable-boost  --enable-boost-mpi  --enable-ptscotch  --enable-openblas  --enable-plasma  --enable-packaging  --with-mpi-families=openmpi3  --with-compiler-families=gnu7
+      shell: /home/ohpc-test/configure.sh
       become: yes
       become_user: ohpc-test
       become_method: su
+      register: testsuite_configure
+
+    - debug: msg="{{ testsuite_configure.stdout_lines }} {{ testsuite_configure.stderr_lines }}"
 
     - name: Run the test suite with JUnit xml output in addition to regular logs
       shell: cd /home/ohpc-test/tests && make check
