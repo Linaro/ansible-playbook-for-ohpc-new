@@ -79,6 +79,11 @@
   - name: replace MaxTime
     replace: dest="/etc/slurm/slurm.conf" regexp='MaxTime=24:00:00' replace="MaxTime=INFINITE" backup=yes
 
+  - name: replace ReturnToService
+    replace: dest="/etc/slurm/slurm.conf" regexp='ReturnToService=1' replace="ReturnToService=2" backup=yes
+    when: 
+      - force_service == True
+
   when: 
     ( ( inventory_hostname in groups[nt_sms] ) or
     ( inventory_hostname in groups[nt_devnodes] ) or
@@ -106,6 +111,11 @@
 
   - name: replace MaxTime
     replace: dest="{{ compute_chroot_loc }}/etc/slurm/slurm.conf" regexp='MaxTime=24:00:00' replace="MaxTime=INFINITE" backup=yes
+
+  - name: replace ReturnToService
+    replace: dest="{{ compute_chroot_loc }}/etc/slurm/slurm.conf" regexp='ReturnToService=1' replace="ReturnToService=2" backup=yes
+    when: 
+      - force_service == True
 
   when: 
     - inventory_hostname in groups[nt_sms]

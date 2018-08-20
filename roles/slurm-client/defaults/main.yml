@@ -4,3 +4,5 @@
 #roles/slurm-client/defaults/main.yml
 #
 
+# This flag makes ReturnToService=2 instead of =1
+force_service: False
